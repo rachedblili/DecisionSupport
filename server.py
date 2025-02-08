@@ -33,8 +33,9 @@ def chat():
 
 @app.route('/api/clear_chat', methods=['POST'])
 def clear_chat():
+    global thread
     try:
-
+        thread = assistant_client.create_thread()
         return jsonify({"message": "Chat history cleared"})
     except Exception as e:
         logging.error(f"Clear chat error: {e}")
