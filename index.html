@@ -143,7 +143,7 @@
                         button.setAttribute('title', originalTitle);
                         button.classList.remove('bg-green-700');
                     }, 1000);
-                })
+})
                 .catch(err => {
                     console.error('Failed to copy text: ', err);
                     button.setAttribute('title', 'Failed to copy');
@@ -157,113 +157,33 @@
             Alpine.data('chat', () => ({
                 messages: [],
                 input: '',
-                providers: [],
-                selectedProvider: null,
-                models: [],
-                selectedModel: null,
                 isConnected: true,
                 isLoading: false,
-                modelColors: new Map(),
-                colorPalette: [
-                    'border-blue-300',
-                    'border-green-300',
-                    'border-orange-300',
-                    'border-purple-300',
-                    'border-pink-300',
-                    'border-teal-300',
-                    'border-red-300',
-                    'border-indigo-300',
-                    'border-yellow-300',
-                    'border-cyan-300'
-                ],
-                currentColorIndex: 0,
 
-                getModelColor(modelName) {
-                    if (!this.modelColors.has(modelName)) {
-                        // Assign next color in palette
-                        this.modelColors.set(modelName, this.colorPalette[this.currentColorIndex]);
-                        // Cycle through colors
-                        this.currentColorIndex = (this.currentColorIndex + 1) % this.colorPalette.length;
-                    }
-                    return this.modelColors.get(modelName);
-                },
                 async init() {
-                    await this.loadProviders();
-
                     this.$watch('messages', () => {
                         this.$nextTick(() => {
                             //this.scrollToBottom();
                         });
                     });
-
-                    this.$watch('selectedProvider', async (value) => {
-                        if (value) {
-                            await this.loadModels(value);
-                        }
-                    });
                 },
 
-                async fetchProviders() {
-                    try {
-                        const response = await fetch(`${BACKEND_CONFIG.BASE_URL}/llmpicker-backend/api/providers`);
-                        return await response.json();
-                    } catch (error) {
-                        console.error('Failed to load providers:', error);
-                        this.isConnected = false;
-                        throw error;
-                    }
-                },
-                async fetchModels(provider) {
-                    try {
-                        const response = await fetch(`${BACKEND_CONFIG.BASE_URL}/llmpicker-backend/api/models/${provider}`);
-                        return await response.json();
-                    } catch (error) {
-                        console.error('Failed to load models:', error);
-                        throw error;
-                    }
-                },
                 async sendChatMessage(userInput) {
                     try {
-                        const response = await fetch(`${BACKEND_CONFIG.BASE_URL}/llmpicker-backend/api/chat`, {
+                        const response = await fetch(`${BACKEND_CONFIG.BASE_URL}/api/chat`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
-                                provider: this.selectedProvider,
-                                model: this.selectedModel,
                                 message: userInput
                             })
                         });
                         return await response.json();
                     } catch (error) {
                         console.error('Failed to send message:', error);
+                        this.isConnected = false;
                         throw error;
-                    }
-                },
-
-                async loadProviders() {
-                    try {
-                        const data = await this.fetchProviders();
-                        this.providers = data.providers;
-                        if (this.providers.length > 0) {
-                            this.selectedProvider = this.providers[0];
-                        }
-                    } catch (error) {
-                        // Error handling already in fetchProviders
-                    }
-                },
-
-                async loadModels(provider) {
-                    try {
-                        const data = await this.fetchModels(provider);
-                        this.models = data.models;
-                        if (this.models.length > 0) {
-                            this.selectedModel = this.models[0];
-                        }
-                    } catch (error) {
-                        this.models = [];
-                        this.selectedModel = null;
                     }
                 },
 
@@ -309,7 +229,7 @@
                     return unsafe
                       .replace(/&/g, "&amp;")
                       .replace(/</g, "&lt;")
-                      .replace(/>/g, "&gt;")
+.replace(/>/g, "&gt;")
                       .replace(/"/g, "&quot;")
                       .replace(/'/g, "&#039;");
 
@@ -321,26 +241,13 @@
                 },
 
                 async sendMessage() {
-                    if (!this.input.trim() || !this.selectedProvider || !this.selectedModel) return;
-
-                    // Check if the current model is different from the last message's model
-                    const lastMessage = this.messages[this.messages.length - 1];
-                    const currentModel = this.selectedModel;
-
-                    if (!lastMessage || lastMessage.model !== currentModel) {
-                        this.messages.push({
-                            role: 'system',
-                            content: `Model switched to "${currentModel}"`,
-                            model: currentModel
-                        });
-                    }
+                    if (!this.input.trim()) return;
 
                     // Add user message
                     this.messages.push({
                         role: 'user',
                         content: this.input,
                         raw: true,
-                        model: this.selectedModel
                     });
                     const userInput = this.input;
                     this.input = '';
@@ -361,7 +268,6 @@
                                 // If your backend returns HTML/Markdown, set raw accordingly.
                                 // For safety, you can default to `false` so formatting is applied.
                                 raw: false,
-                                model: this.selectedModel
                             });
                         } else {
                             throw new Error(data.error || 'Failed to get response');
@@ -370,7 +276,6 @@
                         this.messages.push({
                             role: 'assistant',
                             content: `Error: ${error.message}`,
-                            model: this.selectedModel
                         });
                     } finally {
                         this.isLoading = false;
@@ -390,7 +295,8 @@
                       if (loadingSpinner) {
                         loadingSpinner.scrollIntoView({ behavior: 'smooth', block: 'center' });
                       }
-                    }, 0);
+                    },
+0);
                   });
                 },
                 scrollToLatestAssistantMessage() {
@@ -431,22 +337,14 @@
                     return codeBlocks;
                 },
                 async clearChat() {
-                    if (!this.selectedProvider || !this.selectedModel) {
-                        alert('Please select a provider and model before clearing the chat.');
-                        return;
-                    }
-
                     try {
                         // Send a POST request to the /api/clear_chat endpoint
-                        const response = await fetch(`${BACKEND_CONFIG.BASE_URL}/llmpicker-backend/api/clear_chat`, {
+                        const response = await fetch(`${BACKEND_CONFIG.BASE_URL}/api/clear_chat`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify({
-                                provider: this.selectedProvider,
-                                model: this.selectedModel,
-                            }),
+                            body: JSON.stringify({}),
                         });
 
                         const result = await response.json();
@@ -455,8 +353,7 @@
                             // Add a system message instead of an alert
                             this.messages.push({
                                 role: 'system',
-                                content: `Chat history cleared for model "${this.selectedModel}"`,
-                                model: this.selectedModel
+                                content: `Chat history cleared`,
                             });
                         } else {
                             // Handle error response
@@ -467,47 +364,13 @@
                         alert(`Failed to clear chat: ${error.message}`);
                     }
                 },
-
-            }));
+}));
         });
     </script>
 
     <div x-data="chat" class="flex flex-col h-screen max-w-4xl mx-auto p-4 sm:p-4 md:p-6">
         <!-- Header with provider and model selectors -->
         <div class="flex flex-col sm:flex-row items-center justify-between mb-4 gap-4">
-            <div class="flex flex-col sm:flex-row gap-4 w-full mb-2 sm:mb-0">
-                <div class="relative flex-1 w-full">
-                    <select
-                        x-model="selectedProvider"
-                        class="w-full appearance-none bg-white border rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        <template x-for="provider in providers" :key="provider">
-                            <option :value="provider" x-text="provider"></option>
-                        </template>
-                    </select>
-                    <div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="relative flex-1 w-full">
-                    <select
-                        x-model="selectedModel"
-                        class="w-full appearance-none bg-white border rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        <template x-for="model in models" :key="model">
-                            <option :value="model" x-text="model"></option>
-                        </template>
-                    </select>
-                    <div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </div>
-                </div>
-            </div>
             <div class="flex items-center space-x-2 w-full sm:w-auto">
                 <button @click="clearChat" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Clear</button>
                 <template x-if="!isConnected">
@@ -535,11 +398,11 @@
                                 : 'p-4 rounded-lg relative ' + (
                                     message.role === 'user'
                                         ? 'bg-blue-100 ml-12'
-                                        : 'bg-white border ' + getModelColor(message.model)
+                                        : 'bg-white border border-gray-300'
                                 )
                         }`"
                     >
-                        <template x-if="message.role === 'system'">
+<template x-if="message.role === 'system'">
                             <div class="flex items-center space-x-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -552,7 +415,7 @@
                             <div>
                                 <template x-if="message.role !== 'system'">
                                     <div class="flex justify-between items-center">
-                                        <div class="text-xs text-gray-500 mb-1" x-text="message.role === 'user' ? 'You' : message.model"></div>
+                                        <div class="text-xs text-gray-500 mb-1" x-text="message.role === 'user' ? 'You' : 'AI'"></div>
                                     </div>
                                 </template>
 
@@ -587,7 +450,7 @@
             </div>
             <button
                 type="submit"
-                :disabled="!input.trim() || isLoading || !selectedModel"
+                :disabled="!input.trim() || isLoading"
                 class="w-full sm:w-auto p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -598,5 +461,3 @@
     </div>
 </body>
 </html>
-
-
