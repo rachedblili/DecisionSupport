@@ -46,4 +46,4 @@ if __name__ == '__main__':
     # Create an assistant and a new thread.
     assistant = assistant_client.create_assistant()
     thread = assistant_client.create_thread()
-    app.run(host='0.0.0.0', port=5555)
+    app.run(host='0.0.0.0', port=5556)
