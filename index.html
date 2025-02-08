@@ -4,7 +4,7 @@
     <link rel="icon" href="favicon-llmpicker.png" type="image/png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LLM Chat Interface</title>
+    <title>AI Decision Support System</title>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.5/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
@@ -161,6 +161,25 @@
                 isLoading: false,
 
                 async init() {
+                    this.messages.push({
+                        role: 'assistant',
+                        content: `🌐 Bilingual Decision Support Agent / Agent de Support à la Décision Bilingue
+
+                [English]
+                Hello! I'm your AI Decision Support Agent. I'm here to help you navigate complex decisions systematically and thoroughly.
+
+                Would you like to start a decision-making process? I can guide you step-by-step through identifying your goal, gathering information, evaluating alternatives, and making a well-informed choice.
+
+                What decision are you looking to make today?
+
+                [Français]
+                Bonjour ! Je suis votre Agent d'Intelligence Artificielle de Support à la Décision. Je suis là pour vous aider à naviguer dans des décisions complexes de manière systématique et approfondie.
+
+                Souhaitez-vous commencer un processus de prise de décision ? Je peux vous guider étape par étape pour identifier votre objectif, rassembler des informations, évaluer les alternatives et prendre un choix bien informé.
+
+                Quelle décision cherchez-vous à prendre aujourd'hui ?`,
+                        raw: false
+                    });
                     this.$watch('messages', () => {
                         this.$nextTick(() => {
                             //this.scrollToBottom();
