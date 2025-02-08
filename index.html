@@ -163,21 +163,7 @@
                 async init() {
                     this.messages.push({
                         role: 'assistant',
-                        content: `🌐 Bilingual Decision Support Agent / Agent de Support à la Décision Bilingue
-
-                [English]
-                Hello! I'm your AI Decision Support Agent. I'm here to help you navigate complex decisions systematically and thoroughly.
-
-                Would you like to start a decision-making process? I can guide you step-by-step through identifying your goal, gathering information, evaluating alternatives, and making a well-informed choice.
-
-                What decision are you looking to make today?
-
-                [Français]
-                Bonjour ! Je suis votre Agent d'Intelligence Artificielle de Support à la Décision. Je suis là pour vous aider à naviguer dans des décisions complexes de manière systématique et approfondie.
-
-                Souhaitez-vous commencer un processus de prise de décision ? Je peux vous guider étape par étape pour identifier votre objectif, rassembler des informations, évaluer les alternatives et prendre un choix bien informé.
-
-                Quelle décision cherchez-vous à prendre aujourd'hui ?`,
+                        content: "🌐 Bilingual Decision Support Agent / Agent de Support à la Décision Bilingue \n\n Hello! I'm your AI Decision Support Agent. I'm here to help you navigate complex decisions systematically and thoroughly.  \n Would you like to start a decision-making process? I can guide you step-by-step through identifying your goal, gathering information, evaluating alternatives, and making a well-informed choice.  \n What decision are you looking to make today?  \n\n Bonjour ! Je suis votre Agent d'Intelligence Artificielle de Support à la Décision. Je suis là pour vous aider à naviguer dans des décisions complexes de manière systématique et approfondie.  \n Souhaitez-vous commencer un processus de prise de décision ? Je peux vous guider étape par étape pour identifier votre objectif, rassembler des informations, évaluer les alternatives et prendre un choix bien informé.  \n Quelle décision cherchez-vous à prendre aujourd'hui ?",
                         raw: false
                     });
                     this.$watch('messages', () => {
